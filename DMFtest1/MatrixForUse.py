@@ -48,7 +48,6 @@ def matrixDic(path = 'ml-100k'):
     users4 = filterForUser(datetime.datetime(1997, 12, 1), datetime.datetime(1998, 1, 1), users)
     users5 = filterForUser(datetime.datetime(1998, 1, 1), datetime.datetime(1998, 2, 1), users)
     users6 = filterForUser(datetime.datetime(1998, 2, 1), datetime.datetime(1998, 3, 1), users)
-    print len(users1), len(users2), len(users3), len(users4), len(users5), len(users6)
 
     #only keep 922 users
     # tmp = {}

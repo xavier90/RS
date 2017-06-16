@@ -26,7 +26,7 @@ non_zero_count = []
 
 #check num of rating in each time window
 matrix_for_use = []
-for i in range(12):
+for i in range(60):
     matrix_for_use.append(matrixDic(i, True, False))
 
 strange_user = 0

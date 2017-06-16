@@ -46,74 +46,19 @@ def matrixDic(timeWindowId, wholeUsers = True, overlap = True, path = 'ml-100k')
     #1997/9/1 -1998/3/1
     #set time interval
     time_interval = []
-    if timeWindowId == 0:
-        time_interval = [datetime.datetime(1997, 9, 1), datetime.datetime(1997, 9, 15)]
-    elif timeWindowId == 1:
-        if overlap:
-            start = datetime.datetime(1997, 9, 1)
-        else:
-            start = datetime.datetime(1997, 9, 15)
-        time_interval = [start, datetime.datetime(1997, 10, 1)]
-    elif timeWindowId == 2:
-        if overlap:
-            start = datetime.datetime(1997, 9, 1)
-        else:
-            start = datetime.datetime(1997, 10, 1)
-        time_interval = [start, datetime.datetime(1997, 10, 15)]
-    elif timeWindowId == 3:
-        if overlap:
-            start = datetime.datetime(1997, 9, 1)
-        else:
-            start = datetime.datetime(1997, 10, 15)
-        time_interval = [start, datetime.datetime(1997, 11, 1)]
-    elif timeWindowId == 4:
-        if overlap:
-            start = datetime.datetime(1997, 9, 1)
-        else:
-            start = datetime.datetime(1997, 11, 1)
-        time_interval = [start, datetime.datetime(1997, 11, 15)]
-    elif timeWindowId == 5:
-        if overlap:
-            start = datetime.datetime(1997, 9, 1)
-        else:
-            start = datetime.datetime(1997, 11, 15)
-        time_interval = [start, datetime.datetime(1997, 12, 1)]
-    elif timeWindowId == 6:
-        if overlap:
-            start = datetime.datetime(1997, 9, 1)
-        else:
-            start = datetime.datetime(1997, 12, 1)
-        time_interval = [start, datetime.datetime(1997, 12, 15)]
-    elif timeWindowId == 7:
-        if overlap:
-            start = datetime.datetime(1997, 9, 1)
-        else:
-            start = datetime.datetime(1997, 12, 15)
-        time_interval = [start, datetime.datetime(1998, 1, 1)]
-    elif timeWindowId == 8:
-        if overlap:
-            start = datetime.datetime(1997, 9, 1)
-        else:
-            start = datetime.datetime(1998, 1, 1)
-        time_interval = [start, datetime.datetime(1998, 1, 15)]
-    elif timeWindowId == 9:
-        if overlap:
-            start = datetime.datetime(1997, 9, 1)
-        else:
-            start = datetime.datetime(1998, 1, 15)
-        time_interval = [start, datetime.datetime(1998, 2, 1)]
-    elif timeWindowId == 10:
-        if overlap:
-            start = datetime.datetime(1997, 9, 1)
-        else:
-            start = datetime.datetime(1998, 2, 1)
-        time_interval = [start, datetime.datetime(1998, 2, 15)]
-    elif timeWindowId == 11:
-        if overlap:
-            start = datetime.datetime(1997, 9, 1)
-        else:
-            start = datetime.datetime(1998, 2, 15)
-        time_interval = [start, datetime.datetime(1998, 3, 1)]
+
+    delta_days = 3
+    delta_date = datetime.timedelta(days=delta_days * timeWindowId)
+    new_date = datetime.datetime(1997, 9, 1) + delta_date
+
+    if overlap:
+        # overlap 3 days
+        start = new_date - datetime.timedelta(days=delta_days*2)
+    else:
+        start = new_date - datetime.timedelta(days = delta_days)
+
+    time_interval = [start, new_date]
+
 
 
 
@@ -167,10 +112,10 @@ def matrixDic(timeWindowId, wholeUsers = True, overlap = True, path = 'ml-100k')
         targetMatrix = users5
 
 
-
-    for id in targetMatrix:
-        tmp[id] = prefs[id]
-    prefs = tmp
+    # used for target user who has votes in all time window
+    # for id in targetMatrix:
+    #     tmp[id] = prefs[id]
+    # prefs = tmp
 
 
     #if user did not rate the movie, then set the rating into zero
@@ -188,7 +133,7 @@ def getUserLatentFactor(K = 5, wholeUsers = True, overlap = True):
 
     # get user matrix for each time window
     matrices = []
-    for i in range(6):
+    for i in range(60):
         matrices.append(matrixDic(i, wholeUsers, overlap))
 
 
@@ -200,19 +145,19 @@ def getUserLatentFactor(K = 5, wholeUsers = True, overlap = True):
     matrix_for_use = array(matrices[0])
     model = NMFsimple(n_components=K, init='random', random_state=0)
     # X.append(model.fit_transform(matrix_for_use))
-    X.append(model.fit_transform(matrix_for_use)[412])
+    X.append(model.fit_transform(matrix_for_use))
     C = model.components_
 
 
     #250.462450954
 
-    for i in range(1, 6):
+    for i in range(1, 60):
         matrix_for_use = array(matrices[i])
 
         # fix item latent factor C, make user latent factor X to burden all the changes during different time window
         tmp_X, C, times = NMFcomplex(matrix_for_use, X[i-1], C, K, 'custom', False)
         # X.append(tmp_X)
-        X.append(tmp_X[412])
+        X.append(tmp_X)
         errors.append(ma_error(X[i-1], X[i]))
 
 
